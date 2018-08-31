@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using LandonApi.Infrastructure;
 
 namespace LandonApi
 {
@@ -28,7 +30,12 @@ namespace LandonApi
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc(opt =>
+            {
+                var jsonFormatter = opt.OutputFormatters.OfType<JsonOutputFormatter>().Single();
+                opt.OutputFormatters.Remove(jsonFormatter);
+                opt.OutputFormatters.Add(new IonOutputFormatter(jsonFormatter));
+            });
 
             services.AddRouting(opt => opt.LowercaseUrls = true);
         }
