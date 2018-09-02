@@ -1,4 +1,5 @@
-﻿using LandonApi.Infrastructure;
+﻿using LandonApi.Filters;
+using LandonApi.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,8 @@ namespace LandonApi
             // Add framework services.
             services.AddMvc(opt =>
             {
+                opt.Filters.Add(typeof(JsonExceptionFilter));
+
                 var jsonFormatter = opt.OutputFormatters.OfType<JsonOutputFormatter>().Single();
                 opt.OutputFormatters.Remove(jsonFormatter);
                 opt.OutputFormatters.Add(new IonOutputFormatter(jsonFormatter));

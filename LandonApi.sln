@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LandonApi", "LandonApi\LandonApi.csproj", "{E05C3824-A5F6-4B8C-B8C1-16D86BE13855}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LandonApi", "LandonApi\LandonApi.csproj", "{E05C3824-A5F6-4B8C-B8C1-16D86BE13855}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +18,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F5C02900-0145-42B4-B98F-BE4D40F5DEB0}
 	EndGlobalSection
 EndGlobal
