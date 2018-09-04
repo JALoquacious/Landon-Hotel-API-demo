@@ -1,6 +1,7 @@
 ﻿using LandonApi.Filters;
 using LandonApi.Infrastructure;
 using LandonApi.Models;
+using LandonApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -74,6 +75,8 @@ namespace LandonApi
             });
 
             services.Configure<HotelInfo>(Configuration.GetSection("Info"));
+
+            services.AddScoped<IRoomService, DefaultRoomService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
