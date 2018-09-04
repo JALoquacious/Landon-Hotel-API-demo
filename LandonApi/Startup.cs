@@ -1,5 +1,6 @@
 ﻿using LandonApi.Filters;
 using LandonApi.Infrastructure;
+using LandonApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -66,6 +67,8 @@ namespace LandonApi
                 opt.DefaultApiVersion = new ApiVersion(1, 0);
                 opt.ApiVersionSelector = new CurrentImplementationApiVersionSelector(opt);
             });
+
+            services.Configure<HotelInfo>(Configuration.GetSection("Info"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
