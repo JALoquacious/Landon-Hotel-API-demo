@@ -1,4 +1,5 @@
-﻿using LandonApi.Filters;
+﻿using AutoMapper;
+using LandonApi.Filters;
 using LandonApi.Infrastructure;
 using LandonApi.Models;
 using LandonApi.Services;
@@ -47,7 +48,11 @@ namespace LandonApi
         public void ConfigureServices(IServiceCollection services)
         {
             // Use in-memory database for development (swap with real database in production)
-            services.AddDbContext<HotelApiContext>(opt => opt.UseInMemoryDatabase());
+            services.AddDbContext<HotelApiContext>(opt => opt.UseInMemoryDatabase("LandonHotelDatabase"));
+
+            // Use AutoMapper to automatically manage conversion of entities to POCOs
+            services.AddAutoMapper();
+            Mapper.Initialize(mapConfig => mapConfig.AddProfile<MappingProfile>());
 
             // Add framework services.
             services.AddMvc(opt =>

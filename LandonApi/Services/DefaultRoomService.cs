@@ -1,4 +1,5 @@
-﻿using LandonApi.Models;
+﻿using AutoMapper;
+using LandonApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading;
@@ -21,14 +22,7 @@ namespace LandonApi.Services
 
             if (entity == null) return null;
 
-            var resource = new Room()
-            {
-                Href = null, //Url.Link(nameof(GetRoomByIdAsync), new { roomId = entity.Id }),
-                Name = entity.Name,
-                Rate = entity.Rate / 100.0m
-            };
-
-            return resource;
+            return Mapper.Map<Room>(entity);
         }
     }
 }
