@@ -38,7 +38,7 @@ namespace LandonApi.Models
         [JsonIgnore]
         public string RouteName { get; set; }
 
-        // Stores the route name before being rewritten
+        // Stores the route values before being rewritten
         [JsonIgnore]
         public object RouteValues { get; set; }
     }
