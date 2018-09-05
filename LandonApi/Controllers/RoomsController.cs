@@ -1,7 +1,5 @@
-﻿using LandonApi.Models;
-using LandonApi.Services;
+﻿using LandonApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
