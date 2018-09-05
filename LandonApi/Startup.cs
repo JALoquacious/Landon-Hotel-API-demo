@@ -58,6 +58,7 @@ namespace LandonApi
             services.AddMvc(opt =>
             {
                 opt.Filters.Add(typeof(JsonExceptionFilter));
+                opt.Filters.Add(typeof(LinkRewritingFilter));
 
                 // Require HTTPS for all controllers
                 opt.SslPort = _httpsPort;
