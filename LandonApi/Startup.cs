@@ -114,7 +114,7 @@ namespace LandonApi
             {
                 Id = Guid.Parse("301df04d-8679-4b1b-ab92-0a586ae53d08"),
                 Name = "Oxford Suite",
-                Rate = 10119,
+                Rate = 10119
             });
 
             context.Rooms.Add(new RoomEntity
