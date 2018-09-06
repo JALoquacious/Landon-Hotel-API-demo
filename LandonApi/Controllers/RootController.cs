@@ -13,7 +13,7 @@ namespace LandonApi.Controllers
             var response = new RootResponse
             {
                 Self = Link.To(nameof(GetRoot)),
-                Rooms = Link.To(nameof(RoomsController.GetRoomsAsync)),
+                Rooms = Link.ToCollection(nameof(RoomsController.GetRoomsAsync)),
                 Info = Link.To(nameof(InfoController.GetInfo))
             };
 
