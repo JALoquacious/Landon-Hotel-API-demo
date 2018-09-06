@@ -52,14 +52,11 @@ namespace LandonApi.Controllers
             pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
             var openings = await _openingService.GetOpeningsAsync(pagingOptions, ct);
-            var collection = new PagedCollection<Opening>
-            {
-                Self = Link.ToCollection(nameof(GetAllRoomOpeningsAsync)),
-                Value = openings.Items.ToArray(),
-                Size = openings.TotalSize,
-                Offset = pagingOptions.Offset.Value,
-                Limit = pagingOptions.Limit.Value
-            };
+            var collection = PagedCollection<Opening>.Create(
+                Link.ToCollection(nameof(GetAllRoomOpeningsAsync)),
+                openings.Items.ToArray(),
+                openings.TotalSize,
+                pagingOptions);
 
             return Ok(collection);
         }
