@@ -1,6 +1,7 @@
 ﻿using LandonApi.Models;
 using LandonApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
 using System.Threading;
@@ -13,11 +14,16 @@ namespace LandonApi.Controllers
     {
         private readonly IRoomService _roomService;
         private readonly IOpeningService _openingService;
+        private readonly PagingOptions _defaultPagingOptions;
 
-        public RoomsController(IRoomService roomService, IOpeningService openingService)
+        public RoomsController(
+            IRoomService roomService,
+            IOpeningService openingService,
+            IOptions<PagingOptions> defaultPagingOptions)
         {
             _roomService = roomService;
             _openingService = openingService;
+            _defaultPagingOptions = defaultPagingOptions.Value;
         }
 
         [HttpGet(Name = nameof(GetRoomsAsync))]
@@ -40,6 +46,11 @@ namespace LandonApi.Controllers
             [FromQuery] PagingOptions pagingOptions,
             CancellationToken ct)
         {
+            if (!ModelState.IsValid) return BadRequest(new ApiError(ModelState));
+
+            pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
+            pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
+
             var openings = await _openingService.GetOpeningsAsync(pagingOptions, ct);
             var collection = new PagedCollection<Opening>
             {
