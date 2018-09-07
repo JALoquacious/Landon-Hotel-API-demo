@@ -27,8 +27,10 @@ namespace LandonApi.Models
         public Link Last { get; set; }
 
         public static PagedCollection<T> Create(Link self, T[] items, int size, PagingOptions pagingOptions)
-        {
-            return new PagedCollection<T>
+            => Create<PagedCollection<T>>(self, items, size, pagingOptions);
+
+        public static TResponse Create<TResponse>(Link self, T[] items, int size, PagingOptions pagingOptions)
+            where TResponse : PagedCollection<T>, new() => new TResponse
             {
                 Self = self,
                 Value = items,
@@ -40,7 +42,6 @@ namespace LandonApi.Models
                 Previous = GetPreviousLink(self, size, pagingOptions),
                 Last = GetLastLink(self, size, pagingOptions)
             };
-        }
 
         private static Link GetNextLink(Link self, int size, PagingOptions pagingOptions)
         {
@@ -52,7 +53,7 @@ namespace LandonApi.Models
             var next = offset + limit;
             if (next >= size) return null;
 
-            return SetNewLink(self, limit, next);
+            return SetNewRoute(self, limit, next);
         }
 
         private static Link GetLastLink(Link self, int size, PagingOptions pagingOptions)
@@ -65,7 +66,7 @@ namespace LandonApi.Models
 
             var offset = Math.Ceiling((size - (double)limit) / limit) * limit;
 
-            return SetNewLink(self, limit, offset);
+            return SetNewRoute(self, limit, offset);
         }
 
         private static Link GetPreviousLink(Link self, int size, PagingOptions pagingOptions)
@@ -93,10 +94,10 @@ namespace LandonApi.Models
                 return self;
             }
 
-            return SetNewLink(self, limit, previous);
+            return SetNewRoute(self, limit, previous);
         }
 
-        private static Link SetNewLink(Link self, int limit, double offset)
+        private static Link SetNewRoute(Link self, int limit, double offset)
         {
             var parameters = new RouteValueDictionary(self.RouteValues)
             {

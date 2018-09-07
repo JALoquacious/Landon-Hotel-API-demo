@@ -1,4 +1,6 @@
-﻿namespace LandonApi.Models
+﻿using LandonApi.Infrastructure;
+
+namespace LandonApi.Models
 {
     public class Room : Resource
     {

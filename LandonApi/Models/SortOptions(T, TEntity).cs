@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using LandonApi.Infrastructure;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -10,7 +12,17 @@ namespace LandonApi.Models
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            throw new System.NotImplementedException();
+            var processor = new SortOptionsProcessor<T, TEntity>(OrderBy);
+
+            var validTerms = processor.GetValidTerms().Select(x => x.Name);
+
+            var invalidTerms = processor.GetAllTerms().Select(x => x.Name)
+                .Except(validTerms, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var term in invalidTerms)
+            {
+                yield return new ValidationResult($"Invalid sort term '{term}'.", new[] { nameof(OrderBy) });
+            }
         }
 
         public IQueryable<TEntity> Apply(IQueryable<TEntity> query)
