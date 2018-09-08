@@ -8,7 +8,7 @@ namespace LandonApi.Models
         [Sortable]
         public string Name { get; set; }
 
-        [Searchable]
+        [SearchableDecimal]
         [Sortable(Default = true)]
         public decimal Rate { get; set; }
     }
