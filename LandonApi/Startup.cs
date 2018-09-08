@@ -140,6 +140,13 @@ namespace LandonApi
                 Rate = 23959
             });
 
+            context.Rooms.Add(new RoomEntity
+            {
+                Id = Guid.NewGuid(),
+                Name = "Cambridge Suite",
+                Rate = 32309
+            });
+
             var today = DateTimeOffset.Now;
             var start = dateLogicService.AlignStartTime(today);
             var end = start.Add(dateLogicService.GetMinimumStay());
