@@ -3,7 +3,6 @@ using AutoMapper.QueryableExtensions;
 using LandonApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,9 +29,12 @@ namespace LandonApi.Services
         public async Task<PagedResults<Room>> GetRoomsAsync(
             PagingOptions pagingOptions,
             SortOptions<Room, RoomEntity> sortOptions,
+            SearchOptions<Room, RoomEntity> searchOptions,
             CancellationToken ct)
         {
             IQueryable<RoomEntity> query = _context.Rooms;
+            // Apply search before sort
+            query = searchOptions.Apply(query);
             query = sortOptions.Apply(query);
 
             var size = await query.CountAsync(ct);
