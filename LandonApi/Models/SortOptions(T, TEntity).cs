@@ -27,7 +27,8 @@ namespace LandonApi.Models
 
         public IQueryable<TEntity> Apply(IQueryable<TEntity> query)
         {
-            throw new System.NotImplementedException();
+            var processor = new SortOptionsProcessor<T, TEntity>(OrderBy);
+            return processor.Apply(query);
         }
     }
 }
