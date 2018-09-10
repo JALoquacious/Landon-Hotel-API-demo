@@ -36,7 +36,7 @@ namespace LandonApi.Services
             var id = Guid.NewGuid();
             var newBooking = _context.Bookings.Add(new BookingEntity
             {
-                Id = Guid.NewGuid(),
+                Id = id,
                 CreatedAt = DateTimeOffset.UtcNow,
                 ModifiedAt = DateTimeOffset.UtcNow,
                 StartAt = startAt.ToUniversalTime(),
@@ -49,6 +49,16 @@ namespace LandonApi.Services
             if (created < 1) throw new InvalidOperationException("Could not create booking.");
 
             return id;
+        }
+
+        public async Task DeleteBookingAsync(Guid bookingId, CancellationToken ct)
+        {
+            var booking = await _context.Bookings
+                .SingleOrDefaultAsync(b => b.Id == bookingId, ct);
+            if (booking == null) return;
+
+            _context.Bookings.Remove(booking);
+            await _context.SaveChangesAsync(ct);
         }
 
         public async Task<Booking> GetBookingAsync(
