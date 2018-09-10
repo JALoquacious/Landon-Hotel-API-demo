@@ -19,5 +19,7 @@ namespace LandonApi.Models
         [Sortable]
         [SearchableDecimal]
         public decimal Rate { get; set; }
+
+        public Form Book { get; set; }
     }
 }
