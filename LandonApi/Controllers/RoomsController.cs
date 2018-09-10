@@ -60,6 +60,8 @@ namespace LandonApi.Controllers
         [HttpGet("openings", Name = nameof(GetAllRoomOpeningsAsync))]
         public async Task<IActionResult> GetAllRoomOpeningsAsync(
             [FromQuery] PagingOptions pagingOptions,
+            [FromQuery] SortOptions<Opening, OpeningEntity> sortOptions,
+            [FromQuery] SearchOptions<Opening, OpeningEntity> searchOptions,
             CancellationToken ct)
         {
             if (!ModelState.IsValid) return BadRequest(new ApiError(ModelState));
@@ -67,7 +69,11 @@ namespace LandonApi.Controllers
             pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
             pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
-            var openings = await _openingService.GetOpeningsAsync(pagingOptions, ct);
+            var openings = await _openingService.GetOpeningsAsync(
+                pagingOptions,
+                sortOptions,
+                searchOptions,
+                ct);
 
             var collection = PagedCollection<Opening>.Create(
                 Link.ToCollection(nameof(GetAllRoomOpeningsAsync)),
@@ -109,7 +115,7 @@ namespace LandonApi.Controllers
             var conflictedSlots = await _openingService.GetConflictingSlots(
                 roomId, bookingForm.StartAt.Value, bookingForm.EndAt.Value, ct);
             if (conflictedSlots.Any()) return BadRequest(
-                new ApiError($"This time conflicts with an existing booking."));
+                new ApiError("This time conflicts with an existing booking."));
 
             // TO DO: Get the user ID
             var userId = Guid.NewGuid();

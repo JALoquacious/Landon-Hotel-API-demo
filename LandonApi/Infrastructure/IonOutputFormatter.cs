@@ -19,8 +19,6 @@ namespace LandonApi.Infrastructure
         }
 
         public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-        {
-            return _jsonOutputFormatter.WriteResponseBodyAsync(context, selectedEncoding);
-        }
+            => _jsonOutputFormatter.WriteResponseBodyAsync(context, selectedEncoding);
     }
 }

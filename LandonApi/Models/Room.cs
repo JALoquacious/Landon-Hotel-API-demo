@@ -4,12 +4,12 @@ namespace LandonApi.Models
 {
     public class Room : Resource
     {
-        [Searchable]
         [Sortable]
+        [SearchableString]
         public string Name { get; set; }
 
-        [SearchableDecimal]
         [Sortable(Default = true)]
+        [SearchableDecimal]
         public decimal Rate { get; set; }
     }
 }
