@@ -1,7 +1,6 @@
 ﻿using LandonApi.Models;
 using LandonApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
@@ -15,15 +14,21 @@ namespace LandonApi.Controllers
     {
         private readonly IRoomService _roomService;
         private readonly IOpeningService _openingService;
+        private readonly IDateLogicService _dateLogicService;
+        private readonly IBookingService _bookingService;
         private readonly PagingOptions _defaultPagingOptions;
 
         public RoomsController(
             IRoomService roomService,
             IOpeningService openingService,
+            IDateLogicService dateLogicService,
+            IBookingService bookingService,
             IOptions<PagingOptions> defaultPagingOptions)
         {
             _roomService = roomService;
             _openingService = openingService;
+            _dateLogicService = dateLogicService;
+            _bookingService = bookingService;
             _defaultPagingOptions = defaultPagingOptions.Value;
         }
 
@@ -73,7 +78,7 @@ namespace LandonApi.Controllers
             return Ok(collection);
         }
 
-
+        // TO DO: Authentication!
         // GET /rooms/{roomId}
         [HttpGet("{roomId}", Name = nameof(GetRoomByIdAsync))]
         public async Task<IActionResult> GetRoomByIdAsync(Guid roomId, CancellationToken ct)
@@ -82,6 +87,40 @@ namespace LandonApi.Controllers
             if (room == null) return NotFound();
 
             return Ok(room);
+        }
+
+        // POST /rooms/{roomId}/bookings
+        [HttpPost("{roomId}/bookings", Name = nameof(CreateBookingForRoomAsync))]
+        public async Task<IActionResult> CreateBookingForRoomAsync(
+            Guid roomId,
+            [FromBody] BookingForm bookingForm,
+            CancellationToken ct)
+        {
+            if (!ModelState.IsValid) return BadRequest(new ApiError(ModelState));
+
+            var room = await _roomService.GetRoomAsync(roomId, ct);
+            if (room == null) return NotFound();
+
+            var minimumStay = _dateLogicService.GetMinimumStay();
+            var tooShort = (bookingForm.EndAt.Value - bookingForm.StartAt.Value) < minimumStay;
+            if (tooShort) return BadRequest(
+                new ApiError($"The minimum booking duration is {minimumStay.TotalHours}."));
+
+            var conflictedSlots = await _openingService.GetConflictingSlots(
+                roomId, bookingForm.StartAt.Value, bookingForm.EndAt.Value, ct);
+            if (conflictedSlots.Any()) return BadRequest(
+                new ApiError($"This time conflicts with an existing booking."));
+
+            // TO DO: Get the user ID
+            var userId = Guid.NewGuid();
+
+            var bookingId = await _bookingService.CreateBookingAsync(
+                userId, roomId, bookingForm.StartAt.Value, bookingForm.EndAt.Value, ct);
+
+            return Created(
+                Url.Link(nameof(BookingsController.GetBookingByIdAsync),
+                new { bookingId }),
+                null);
         }
     }
 }
