@@ -15,6 +15,7 @@ namespace LandonApi.Controllers
         }
 
         [HttpGet(Name = nameof(GetInfo))]
+        [ResponseCache(CacheProfileName = "Static")]
         public IActionResult GetInfo()
         {
             _hotelInfo.Href = Url.Link(nameof(GetInfo), null);
