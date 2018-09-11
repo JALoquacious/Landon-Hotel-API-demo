@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace LandonApi
 {
@@ -121,6 +122,11 @@ namespace LandonApi
             // Add test data in development
             if (env.IsDevelopment())
             {
+                // Add test roles and users
+                var roleManager = app.ApplicationServices.GetRequiredService<RoleManager<UserRoleEntity>>();
+                var userManager = app.ApplicationServices.GetRequiredService<UserManager<UserEntity>>();
+                AddTestUsers(roleManager, userManager).Wait();
+
                 var context = app.ApplicationServices.GetRequiredService<HotelApiContext>();
                 var dateLogicService = app.ApplicationServices.GetRequiredService<IDateLogicService>();
                 AddTestData(context, dateLogicService);
@@ -135,6 +141,26 @@ namespace LandonApi
 
             app.UseResponseCaching();
             app.UseMvc();
+        }
+
+        private static async Task AddTestUsers(
+            RoleManager<UserRoleEntity> roleManager,
+            UserManager<UserEntity> userManager)
+        {
+            await roleManager.CreateAsync(new UserRoleEntity("Admin"));
+
+            var user = new UserEntity
+            {
+                Email = "admin@landon.local",
+                UserName = "admin@landon.local",
+                FirstName = "Admin",
+                LastName = "Testerman",
+                CreatedAt = DateTimeOffset.UtcNow
+            };
+
+            await userManager.CreateAsync(user, "SuperSecret123!");
+            await userManager.AddToRoleAsync(user, "Admin");
+            await userManager.UpdateAsync(user);
         }
 
         private static void AddTestData(
