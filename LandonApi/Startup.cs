@@ -5,6 +5,7 @@ using LandonApi.Models;
 using LandonApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -51,6 +52,14 @@ namespace LandonApi
             // Use in-memory database for development (swap with real database in production)
             services.AddDbContext<HotelApiContext>(opt => opt.UseInMemoryDatabase("LandonHotelDatabase"));
             services.AddResponseCaching();
+
+            // Add ASP.NET Core Identity
+            services.AddIdentity<UserEntity, UserRoleEntity>()
+                .AddEntityFrameworkStores<HotelApiContext>()
+                .AddDefaultTokenProviders();
+
+            
+
             // Use AutoMapper to automatically manage conversion of entities to POCOs
             services.AddAutoMapper();
             Mapper.Initialize(mapConfig => mapConfig.AddProfile<MappingProfile>());
