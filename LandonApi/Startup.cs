@@ -111,6 +111,7 @@ namespace LandonApi
             services.AddScoped<IOpeningService, DefaultOpeningService>();
             services.AddScoped<IBookingService, DefaultBookingService>();
             services.AddScoped<IDateLogicService, DefaultDateLogicService>();
+            services.AddScoped<IUserService, DefaultUserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
