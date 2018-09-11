@@ -62,6 +62,7 @@ namespace LandonApi.Controllers
 
         // GET /rooms/openings
         [HttpGet("openings", Name = nameof(GetAllRoomOpeningsAsync))]
+        [ResponseCache(Duration = 30, VaryByQueryKeys = new[] { "offset", "limit", "orderBy", "search" })]
         public async Task<IActionResult> GetAllRoomOpeningsAsync(
             [FromQuery] PagingOptions pagingOptions,
             [FromQuery] SortOptions<Opening, OpeningEntity> sortOptions,

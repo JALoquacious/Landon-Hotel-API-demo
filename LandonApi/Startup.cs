@@ -50,7 +50,7 @@ namespace LandonApi
         {
             // Use in-memory database for development (swap with real database in production)
             services.AddDbContext<HotelApiContext>(opt => opt.UseInMemoryDatabase("LandonHotelDatabase"));
-
+            services.AddResponseCaching();
             // Use AutoMapper to automatically manage conversion of entities to POCOs
             services.AddAutoMapper();
             Mapper.Initialize(mapConfig => mapConfig.AddProfile<MappingProfile>());
@@ -124,6 +124,7 @@ namespace LandonApi
                 opt.Preload();
             });
 
+            app.UseResponseCaching();
             app.UseMvc();
         }
 
