@@ -2,6 +2,7 @@
 using LandonApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,27 @@ namespace LandonApi.Services
         public DefaultUserService(UserManager<UserEntity> userManager)
         {
             _userManager = userManager;
+        }
+
+        public async Task<(bool Succeeded, string Error)> CreateUserAsync(RegisterForm form)
+        {
+            var entity = new UserEntity
+            {
+                Email = form.Email,
+                UserName = form.Email,
+                FirstName = form.FirstName,
+                LastName = form.LastName,
+                CreatedAt = DateTimeOffset.UtcNow
+            };
+
+            var result = await _userManager.CreateAsync(entity, form.Password);
+            if (!result.Succeeded)
+            {
+                var firstError = result.Errors.FirstOrDefault()?.Description;
+                return (false, firstError);
+            }
+
+            return (true, null);
         }
 
         public async Task<PagedResults<User>> GetUsersAsync(
