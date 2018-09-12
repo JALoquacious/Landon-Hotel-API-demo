@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using AspNet.Security.OpenIdConnect.Primitives;
+using AutoMapper;
 using LandonApi.Filters;
 using LandonApi.Infrastructure;
 using LandonApi.Models;
@@ -51,15 +52,61 @@ namespace LandonApi
         public void ConfigureServices(IServiceCollection services)
         {
             // Use in-memory database for development (swap with real database in production)
-            services.AddDbContext<HotelApiContext>(opt => opt.UseInMemoryDatabase("LandonHotelDatabase"));
+            services.AddDbContext<HotelApiContext>(opt =>
+            {
+                opt.UseInMemoryDatabase("LandonHotelDatabase");
+                opt.UseOpenIddict<Guid>();
+            });
+
             services.AddResponseCaching();
+
+            // Map some of the default claim names to the proper OpenID Connect claim names
+            services.Configure<IdentityOptions>(opt =>
+            {
+                opt.ClaimsIdentity.UserNameClaimType = OpenIdConnectConstants.Claims.Name;
+                opt.ClaimsIdentity.UserIdClaimType = OpenIdConnectConstants.Claims.Subject;
+                opt.ClaimsIdentity.RoleClaimType = OpenIdConnectConstants.Claims.Role;
+            });
+
+            // Add OpenIddict services
+            services.AddOpenIddict()
+                .AddCore(options =>
+                {
+                    // Configure OpenIddict to use the Entity Framework Core stores and entities.
+                    options.UseEntityFrameworkCore()
+                           .UseDbContext<HotelApiContext>()
+                           .ReplaceDefaultEntities<Guid>();
+                })
+
+                .AddServer(options =>
+                {
+                    // Register the ASP.NET Core MVC binder used by OpenIddict.
+                    // Note: if you don't call this method, you won't be able to
+                    // bind OpenIdConnectRequest or OpenIdConnectResponse parameters.
+                    options.UseMvc();
+
+                    // Enable the authorization and token endpoints (required to use the code flow).
+                    options.EnableTokenEndpoint("/token");
+
+                    // Allow client applications to use the password flow.
+                    options.AllowPasswordFlow();
+
+                    // During development, you can disable the HTTPS requirement.
+                    //options.DisableHttpsRequirement();
+                });
+
+            //{
+            //    opt.AddEntityFrameworkCoreStores<HotelApiContext>();
+            //    opt.AddMvcBinders();
+
+            //    opt.EnableTokenEndpoint("/token");
+            //    opt.AllowPasswordFlow();
+            //});
 
             // Add ASP.NET Core Identity
             services.AddIdentity<UserEntity, UserRoleEntity>()
                 .AddEntityFrameworkStores<HotelApiContext>()
                 .AddDefaultTokenProviders();
-
-            
 
             // Use AutoMapper to automatically manage conversion of entities to POCOs
             services.AddAutoMapper();
@@ -132,14 +179,14 @@ namespace LandonApi
                 var dateLogicService = app.ApplicationServices.GetRequiredService<IDateLogicService>();
                 AddTestData(context, dateLogicService);
             }
-
+            
+            app.UseAuthentication();
             app.UseHsts(opt =>
             {
                 opt.MaxAge(days: 180);
                 opt.IncludeSubdomains();
                 opt.Preload();
             });
-
             app.UseResponseCaching();
             app.UseMvc();
         }
