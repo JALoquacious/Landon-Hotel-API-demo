@@ -159,6 +159,11 @@ namespace LandonApi
             services.AddScoped<IBookingService, DefaultBookingService>();
             services.AddScoped<IDateLogicService, DefaultDateLogicService>();
             services.AddScoped<IUserService, DefaultUserService>();
+
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("ViewAllUsersPolicy", p => p.RequireAuthenticatedUser().RequireRole("Admin"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

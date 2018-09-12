@@ -14,13 +14,16 @@ namespace LandonApi.Controllers
     public class UsersController : Controller
     {
         private readonly IUserService _userService;
+        private readonly IAuthorizationService _authService;
         private readonly PagingOptions _defaultPagingOptions;
 
         public UsersController(
             IUserService userService,
+            IAuthorizationService authService,
             IOptions<PagingOptions> defaultPagingOptions)
         {
             _userService = userService;
+            _authService = authService;
             _defaultPagingOptions = defaultPagingOptions.Value;
         }
 
@@ -36,10 +39,23 @@ namespace LandonApi.Controllers
             pagingOptions.Offset = pagingOptions.Offset ?? _defaultPagingOptions.Offset;
             pagingOptions.Limit = pagingOptions.Limit ?? _defaultPagingOptions.Limit;
 
-            // TODO: Authorization check. Is the user an admin?
+            var users = new PagedResults<User>();
 
-            var users = await _userService.GetUsersAsync(
-                pagingOptions, sortOptions, searchOptions, ct);
+            if (User.Identity.IsAuthenticated)
+            {
+                var canSeeEveryone = await _authService.AuthorizeAsync(User, "ViewAllUsersPolicy");
+                if (canSeeEveryone.Succeeded)
+                {
+                    users = await _userService.GetUsersAsync(
+                        pagingOptions, sortOptions, searchOptions, ct);
+                }
+                else
+                {
+                    var myself = await _userService.GetUserAsync(User);
+                    users.Items = new[] { myself };
+                    users.TotalSize = 1;
+                }
+            }
 
             var collection = PagedCollection<User>.Create(
                 Link.To(nameof(GetVisibleUsersAsync)),
