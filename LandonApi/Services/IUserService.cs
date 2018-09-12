@@ -1,4 +1,5 @@
 ﻿using LandonApi.Models;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,5 +14,7 @@ namespace LandonApi.Services
             CancellationToken ct);
 
         Task<(bool Succeeded, string Error)> CreateUserAsync(RegisterForm form);
+
+        Task<User> GetUserAsync(ClaimsPrincipal user);
     }
 }

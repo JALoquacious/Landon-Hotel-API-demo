@@ -50,6 +50,18 @@ namespace LandonApi.Controllers
             return Ok(collection);
         }
 
+        [Authorize]
+        [HttpGet("me", Name = nameof(GetMeAsync))]
+        public async Task<IActionResult> GetMeAsync(CancellationToken ct)
+        {
+            if (User == null) return BadRequest();
+
+            var user = await _userService.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            return Ok(user);
+        }
+
         [HttpPost(Name = nameof(RegisterUserAsync))]
         public async Task<IActionResult> RegisterUserAsync(
             [FromBody] RegisterForm form,
@@ -58,7 +70,7 @@ namespace LandonApi.Controllers
             if (!ModelState.IsValid) return BadRequest(new ApiError(ModelState));
 
             var (succeeded, error) = await _userService.CreateUserAsync(form);
-            if (succeeded) return StatusCode(201);
+            if (succeeded) return Created(Url.Link(nameof(GetMeAsync), null), null);
 
             return BadRequest(new ApiError
             {
